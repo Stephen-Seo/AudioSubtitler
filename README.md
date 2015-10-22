@@ -1,5 +1,9 @@
 #Audio Subtitler
 
+##Disclaimer
+
+This video writes the subtitles directly into the video. It does not create a subtitle stream.
+
 ##Dependencies
 
 Requires ffmpeg compiled with --enable-libfreetype and --enable-libfontconfig.
