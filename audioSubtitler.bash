@@ -3,6 +3,7 @@
 OUTPUT_VIDEO_WIDTH=1280
 OUTPUT_VIDEO_HEIGHT=720
 OUTPUT_VIDEO_FORMAT="mkv"
+VERBOSE=0
 
 check_for_error() {
     error_value=$?
@@ -20,6 +21,14 @@ usage() {
     echo "  - generates a config file for that audio"
     echo "./AudioSubtitler --config=<config-file>"
     echo "  - creates the subtitled video using the config file"
+}
+
+verbose_log() {
+    if [ ! $VERBOSE -eq 0 ]; then
+        echo "==== VERBOSE LOG ===="
+        echo "$1"
+        echo "====================="
+    fi
 }
 
 check_param() {
@@ -66,7 +75,7 @@ write_config() {
     echo "# <color as hex> <height in pixels from bottom> <start time in seconds> <end time in seconds> <the text to display>" >> $1
     echo "# Warning: certain characters like ":" may break the script. Try escaping them with backslashes." >> $1
     echo "0xFFFFFF 80 0.2 2 This is some white subtitled text." >> $1
-    echo "0x00FF00 40 2 3.5 This is some green subtitled text. \\\\:yep" >> $1
+    echo "0x00FF00 40 2 3.5 This is some green subtitled text. \\:yep" >> $1
     echo "0x808080 0 3 4 This is some gray subtitled text." >> $1
     echo >> $1
     echo "# This example should work. If it doesn't, pester me to fix it!" >> $1
@@ -145,9 +154,9 @@ create_video() {
         local lineText=$(echo $configLine | awk '{print substr($0, index($0, $5))}')
 
         if [ -z "$drawtextFilter" ]; then
-            drawtextFilter="drawtext=text=$lineText:x=main_w/2-text_w/2:y=main_h-text_h-$lineYPos:enable=between(t\\,$startSeconds\\,$endSeconds):fontcolor=$lineColor:font=$fontName:fontsize=$fontSize"
+            drawtextFilter="drawtext=text='$lineText':x=main_w/2-text_w/2:y=main_h-text_h-$lineYPos:enable=between(t\\,$startSeconds\\,$endSeconds):fontcolor=$lineColor:font=$fontName:fontsize=$fontSize"
         else
-            drawtextFilter="$drawtextFilter, drawtext=text=$lineText:x=main_w/2-text_w/2:y=main_h-text_h-$lineYPos:enable=between(t\\,$startSeconds\\,$endSeconds):fontcolor=$lineColor:font=$fontName:fontsize=$fontSize"
+            drawtextFilter="$drawtextFilter, drawtext=text='$lineText':x=main_w/2-text_w/2:y=main_h-text_h-$lineYPos:enable=between(t\\,$startSeconds\\,$endSeconds):fontcolor=$lineColor:font=$fontName:fontsize=$fontSize"
         fi
 
         configLineIndex=$((configLineIndex + 1))
@@ -158,6 +167,8 @@ create_video() {
     until [ ! -e "${finalOutputName}${finalOutputNumber}.${OUTPUT_VIDEO_FORMAT}" ]; do
         finalOutputNumber=$((finalOutputNumber + 1))
     done
+
+    verbose_log "$drawtextFilter"
 
     ffmpeg -i "${tempVideoFilename}${vnumber}.mkv" -vf "$drawtextFilter" ${finalOutputName}${finalOutputNumber}.${OUTPUT_VIDEO_FORMAT}
     check_for_error "Config file may be invalid in the subtitles section"
