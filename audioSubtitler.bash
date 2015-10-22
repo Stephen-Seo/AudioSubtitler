@@ -108,7 +108,7 @@ generate_blank_video() {
         vnumber=$((vnumber + 1))
     done
 
-    ffmpeg -i $1 -f lavfi -i color=c=black:s=1280x720:r=30:d=$duration ${tempVideoFilename}${vnumber}.mkv
+    ffmpeg -i $1 -f lavfi -i color=c=black:s=${OUTPUT_VIDEO_WIDTH}x${OUTPUT_VIDEO_HEIGHT}:r=30:d=$duration ${tempVideoFilename}${vnumber}.mkv
     check_for_error "Perhaps the audio file in the config is incorrect?"
 }
 
