@@ -64,9 +64,12 @@ write_config() {
     echo "# Example subtitling:" >> $1
     echo >> $1
     echo "# <color as hex> <height in pixels from bottom> <start time in seconds> <end time in seconds> <the text to display>" >> $1
+    echo "# Warning: certain characters like ":" may break the script. Try escaping them with backslashes." >> $1
     echo "0xFFFFFF 80 0.2 2 This is some white subtitled text." >> $1
-    echo "0x00FF00 40 2 3.5 This is some green subtitled text." >> $1
+    echo "0x00FF00 40 2 3.5 This is some green subtitled text. \\\\:yep" >> $1
     echo "0x808080 0 3 4 This is some gray subtitled text." >> $1
+    echo >> $1
+    echo "# This example should work. If it doesn't, pester me to fix it!" >> $1
     echo created config $1
 }
 
