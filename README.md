@@ -2,7 +2,7 @@
 
 ##Disclaimer
 
-This video writes the subtitles directly into the video. It does not create a subtitle stream.
+This script writes the subtitles directly into the video. It does not create a subtitle stream.
 
 ##Dependencies
 
