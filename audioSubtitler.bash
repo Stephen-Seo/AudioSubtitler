@@ -154,9 +154,9 @@ create_video() {
         local lineText=$(echo $configLine | awk '{print substr($0, index($0, $5))}')
 
         if [ -z "$drawtextFilter" ]; then
-            drawtextFilter="drawtext=text='$lineText':x=main_w/2-text_w/2:y=main_h-text_h-$lineYPos:enable=between(t\\,$startSeconds\\,$endSeconds):fontcolor=$lineColor:font=$fontName:fontsize=$fontSize"
+            drawtextFilter="drawtext=expansion=none:text='$lineText':x=main_w/2-text_w/2:y=main_h-text_h-$lineYPos:enable=between(t\\,$startSeconds\\,$endSeconds):fontcolor=$lineColor:font=$fontName:fontsize=$fontSize"
         else
-            drawtextFilter="$drawtextFilter, drawtext=text='$lineText':x=main_w/2-text_w/2:y=main_h-text_h-$lineYPos:enable=between(t\\,$startSeconds\\,$endSeconds):fontcolor=$lineColor:font=$fontName:fontsize=$fontSize"
+            drawtextFilter="$drawtextFilter, drawtext=expansion=none:text='$lineText':x=main_w/2-text_w/2:y=main_h-text_h-$lineYPos:enable=between(t\\,$startSeconds\\,$endSeconds):fontcolor=$lineColor:font=$fontName:fontsize=$fontSize"
         fi
 
         configLineIndex=$((configLineIndex + 1))
