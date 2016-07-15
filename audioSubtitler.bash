@@ -101,15 +101,19 @@ generate_config() {
 }
 
 generate_blank_video() {
+    echo "Creating temporary blank video with audio..."
     local tempLogFilename="tempReport"
     local rnumber=0
     while [ -e "${tempLogFilename}${rnumber}.txt" ]; do
         rnumber=$((rnumber + 1))
     done
 
-    FFREPORT=file=${tempLogFilename}${rnumber}.txt ffprobe $1
+    echo "Creating temporary info file from audio (To get audio length)..."
+    FFREPORT=file=${tempLogFilename}${rnumber}.txt ffprobe $1 2>/dev/null
+    echo "Created temporary info file from audio"
     local duration=$(cat ${tempLogFilename}${rnumber}.txt | grep Duration | awk '{ print $2}' | cut -f1 -d, | awk '{ gsub(/:/, "\\\\:"); print }')
     rm ${tempLogFilename}${rnumber}.txt
+    echo "Removed temporary info file"
 
     tempVideoFilename="tempVideo"
     vnumber=0
@@ -117,12 +121,13 @@ generate_blank_video() {
         vnumber=$((vnumber + 1))
     done
 
-    ffmpeg -i $1 -f lavfi -i color=c=black:s=${OUTPUT_VIDEO_WIDTH}x${OUTPUT_VIDEO_HEIGHT}:r=30:d=$duration ${tempVideoFilename}${vnumber}.mkv
+    ffmpeg -i $1 -f lavfi -i color=c=black:s=${OUTPUT_VIDEO_WIDTH}x${OUTPUT_VIDEO_HEIGHT}:r=30:d=$duration ${tempVideoFilename}${vnumber}.mkv 2>/dev/null
     check_for_error "Perhaps the audio file in the config is incorrect?"
+    echo "Created temporary blank video"
 }
 
 create_video() {
-    echo Create video
+    echo "Creating subtitled video..."
 # ffmpeg -i out.mkv -vf "drawtext=text=Testing...:x=main_w/2-text_w/2:y=main_h-text_h:enable=between(t\,0.5\,4):fontcolor=white" out2.mkv
 
     local inputAudioFilename=$(cat $configFile | awk '$1 !~ /^#/' | awk '$1 !~ /^$/' | awk 'NR == 1')
@@ -170,9 +175,14 @@ create_video() {
 
     verbose_log "$drawtextFilter"
 
-    ffmpeg -i "${tempVideoFilename}${vnumber}.mkv" -vf "$drawtextFilter" ${finalOutputName}${finalOutputNumber}.${OUTPUT_VIDEO_FORMAT}
+    echo "Actually creating subtitled video..."
+    ffmpeg -i "${tempVideoFilename}${vnumber}.mkv" -vf "$drawtextFilter" ${finalOutputName}${finalOutputNumber}.${OUTPUT_VIDEO_FORMAT} 2>/dev/null
+    echo "Actually created subtitled video ${finalOutputName}${finalOutputNumber}.${OUTPUT_VIDEO_FORMAT}"
     check_for_error "Config file may be invalid in the subtitles section"
+    echo "Removing temporary blank video..."
     rm ${tempVideoFilename}${vnumber}.mkv
+    echo "Removed temporary blank video"
+    echo "Created subtitled video ${finalOutputName}${finalOutputNumber}.${OUTPUT_VIDEO_FORMAT}"
 }
 
 main() {
